@@ -8,11 +8,6 @@
 // Base dati: ogni task ha il testo e la priorità (alta, media, bassa)
 const tasks = [
 	{ testo: 'Pagare le bollette', priorita: 'alta' },
-	{ testo: 'Studiare JavaScript', priorita: 'media' },
-	{ testo: 'Comprare il pane', priorita: 'bassa' },
-	{ testo: 'Chiamare il dentista', priorita: 'alta' },
-	{ testo: 'Riposarsi', priorita: 'bassa' },
-	{ testo: 'Aperitivo', priorita: 'alta' },
 	{ testo: 'Studiare JavaScript', priorita: 'alta' },
 	{ testo: 'Comprare il Divano', priorita: 'bassa' },
 	{ testo: 'Chiamare la mia Ex', priorita: 'alta' },
