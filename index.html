@@ -8,16 +8,27 @@
 </head>
 
 <body>
-    <h1 id="titolo">I miei task</h1>
+    <h1 id="titolo">Le mie cose da fare</h1>
 
-    <div class="aggiunta">
+    <form class="aggiunta">
         <input id="nuovo-task" placeholder="Cosa devi fare?" />
-        <button id="bottone-aggiungi">Aggiungi</button>
+        <select id="priorita">
+            <option value="bassa">Bassa</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+        </select>
+        <button id="bottone-aggiungi" type="submit">Aggiungi</button>
+    </form>
+
+    <div class="filtri">
+        <button class="filtro attivo" data-filtro="tutti">Tutti</button>
+        <button class="filtro" data-filtro="attivi">Attivi</button>
+        <button class="filtro" data-filtro="completati">Completati</button>
     </div>
 
     <ul id="lista-task"></ul>
 
-    <p>Totale: <span id="contatore">0</span></p>
+    <p><span id="etichetta">Attivi</span>: <span id="contatore">0</span></p>
 
     <script src="assets/js/script.js"></script>
 </body>

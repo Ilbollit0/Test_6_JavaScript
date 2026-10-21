@@ -1,57 +1,88 @@
-/*
-  REGOLE
-  - Continua quello che hai iniziato stamani in classe.
-  - Niente eventi (li vediamo domani): chiama le funzioni dalla console o all'avvio.
-  - Solo const/let, mai var. Solo querySelector/querySelectorAll per il DOM.
-*/
+// STATO: tutto quello che si vede a schermo dipende da queste variabili
+let tasks = [];
+let filtro = 'tutti';
 
-// Base dati: ogni task ha il testo e la priorità (alta, media, bassa)
-const tasks = [
-  { testo: "Pagare le bollette", priorita: "media" },
-  { testo: "Studiare JavaScript", priorita: "alta" },
-  { testo: "Comprare il Divano", priorita: "bassa" },
-  { testo: "Chiamare la mia Ex", priorita: "alta" },
-  { testo: "Riposarsi", priorita: "alta" },
-  { testo: "Aperitivo", priorita: "bassa" },
-  { testo: "Lavoro", priorita: "alta" },
-  { testo: "Cucina", priorita: "alta" },
-];
+const form = document.querySelector('.aggiunta');
+const input = document.querySelector('#nuovo-task');
+const selectPriorita = document.querySelector('#priorita');
+const filtri = document.querySelector('.filtri');
+const lista = document.querySelector('#lista-task');
+const etichetta = document.querySelector('#etichetta');
+const contatore = document.querySelector('#contatore');
 
-const lista = document.querySelector("#lista-task");
-const contatore = document.querySelector("#contatore");
+// RENDER: ridisegna lista, filtri e contatore partendo dallo stato
+function render() {
+    lista.innerHTML = '';
 
-/* 1 + 2 + 7 — aggiungiTask con priorità, bottone Elimina e data automatica */
-function aggiungiTask(testo, priorita) {
-  const li = document.createElement("li");
-  li.classList.add(`priorita-${priorita}`);
-  li.innerHTML = `${testo} <span class="badge">${priorita}</span>
-		<div class="divData">
-			<span class="data">${new Date().toLocaleString("it-IT")}</span>
-			<button>Elimina</button>
-		</div>`;
-  lista.appendChild(li);
-  contatore.textContent = lista.querySelectorAll("li").length;
+    let visibili = tasks;
+    if (filtro === 'attivi') {
+        visibili = tasks.filter((t) => !t.completato);
+    } else if (filtro === 'completati') {
+        visibili = tasks.filter((t) => t.completato);
+    }
+
+    visibili.forEach((t) => {
+        const li = document.createElement('li');
+        li.classList.add(`priorita-${t.priorita}`);
+        if (t.completato) {
+            li.classList.add('completato');
+        }
+        li.innerHTML = `
+            <input type="checkbox" data-id="${t.id}" ${t.completato ? 'checked' : ''}>
+            <span class="testo"></span>
+            <span class="badge">${t.priorita}</span>
+            <button class="elimina" data-id="${t.id}">Elimina</button>`;
+        li.querySelector('.testo').textContent = t.testo;
+        lista.appendChild(li);
+    });
+
+    document.querySelectorAll('.filtro').forEach((b) => {
+        b.classList.toggle('attivo', b.dataset.filtro === filtro);
+    });
+
+    if (filtro === 'completati') {
+        etichetta.textContent = 'Completati';
+        contatore.textContent = tasks.filter((t) => t.completato).length;
+    } else {
+        etichetta.textContent = 'Attivi';
+        contatore.textContent = tasks.filter((t) => !t.completato).length;
+    }
 }
 
-/* 6 — evidenzia / togliEvidenza */
-function evidenzia(indice) {
-  lista.children[indice].classList.add("evidenziato");
-}
+// Aggiungi task: submit del form
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const testo = input.value.trim();
+    if (testo === '') {
+        return;
+    }
+    tasks.push({ id: Date.now(), testo, priorita: selectPriorita.value, completato: false });
+    form.reset();
+    render();
+});
 
-function togliEvidenza(indice) {
-  lista.children[indice].classList.remove("evidenziato");
-}
+// Event delegation sulla lista: checkbox ed Elimina
+lista.addEventListener('change', (e) => {
+    if (e.target.type === 'checkbox') {
+        const task = tasks.find((t) => t.id === Number(e.target.dataset.id));
+        task.completato = e.target.checked;
+        render();
+    }
+});
 
-/* 8 — contaPerPriorita */
-function contaPerPriorita() {
-  return {
-    alta: lista.querySelectorAll(".priorita-alta").length,
-    media: lista.querySelectorAll(".priorita-media").length,
-    bassa: lista.querySelectorAll(".priorita-bassa").length,
-  };
-}
+lista.addEventListener('click', (e) => {
+    if (e.target.classList.contains('elimina')) {
+        tasks = tasks.filter((t) => t.id !== Number(e.target.dataset.id));
+        render();
+    }
+});
 
-// Avvio: riempie la lista dalla base dati ed evidenzia il secondo task
-tasks.forEach(({ testo, priorita }) => aggiungiTask(testo, priorita));
-evidenzia(1);
-console.log(contaPerPriorita());
+// Filtri: un solo listener sul contenitore
+filtri.addEventListener('click', (e) => {
+    if (e.target.classList.contains('filtro')) {
+        filtro = e.target.dataset.filtro;
+        render();
+    }
+});
+
+render();
